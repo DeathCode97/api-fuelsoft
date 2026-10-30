@@ -27,7 +27,8 @@ public class UsuariosController {
     public UsuariosController(UsuarioService service) {
         this.service = service;
     }
-
+    
+//    RECORDAR QUE PARA CREAR USUARIOS MEDIANTE SU ENDPOINT, ES NECESARIO INICIAR SESION CON EL ADMIN
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UsuarioResponse registrar(@Valid @RequestBody RegistroUsuarioRequest req) {

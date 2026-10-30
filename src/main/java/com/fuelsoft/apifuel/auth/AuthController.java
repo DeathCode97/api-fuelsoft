@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,11 +33,26 @@ public class AuthController {
         this.expirationMinutes = expirationMinutes;
     }
 
+//    @PostMapping("/login")
+//    public LoginResponse login(@RequestBody LoginRequest req) {
+//        Authentication auth = authManager.authenticate(
+//                new UsernamePasswordAuthenticationToken(req.username(), req.password()));
+//        return new LoginResponse(tokenService.generate(auth), "Bearer", expirationMinutes, );
+//    }
+    
     @PostMapping("/login")
     public LoginResponse login(@RequestBody LoginRequest req) {
         Authentication auth = authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(req.username(), req.password()));
-        return new LoginResponse(tokenService.generate(auth), "Bearer", expirationMinutes);
+
+        String rol = auth.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .map(a -> a.replace("ROLE_", ""))
+                .findFirst()
+                .orElse("USER");
+
+        return new LoginResponse(tokenService.generate(auth), "Bearer", expirationMinutes,
+                auth.getName(), rol);
     }
     
     @ExceptionHandler(AuthenticationException.class)
